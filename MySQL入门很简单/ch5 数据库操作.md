@@ -66,34 +66,116 @@ mysql>  SHOW DATABASES;
 
 #### MySQL存储引擎简介
 
-MySQL数据库中的表可以用不同的方式存储，根据需求的不同，选择不同的存储方式，是否进行事务处理。
+MySQL数据库中的表可以用不同的方式存储，根据需求的不同，选择不同的存储方式，是否进行事务处理。查询方法为：
+
+SHOW ENGINES;
+```
+mysql> SHOW ENGINES \G
+*************************** 1. row ***************************
+      Engine: FEDERATED
+     Support: NO
+     Comment: Federated MySQL storage engine
+Transactions: NULL
+          XA: NULL
+  Savepoints: NULL
+*************************** 2. row ***************************
+      Engine: MRG_MYISAM
+     Support: YES
+     Comment: Collection of identical MyISAM tables
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 3. row ***************************
+      Engine: MyISAM
+     Support: YES
+     Comment: MyISAM storage engine
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 4. row ***************************
+      Engine: BLACKHOLE
+     Support: YES
+     Comment: /dev/null storage engine (anything you write to it disa
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 5. row ***************************
+      Engine: CSV
+     Support: YES
+     Comment: CSV storage engine
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 6. row ***************************
+      Engine: MEMORY
+     Support: YES
+     Comment: Hash based, stored in memory, useful for temporary tabl
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 7. row ***************************
+      Engine: ARCHIVE
+     Support: YES
+     Comment: Archive storage engine
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+*************************** 8. row ***************************
+      Engine: InnoDB
+     Support: DEFAULT
+     Comment: Supports transactions, row-level locking, and foreign k
+Transactions: YES
+          XA: YES
+  Savepoints: YES
+*************************** 9. row ***************************
+      Engine: PERFORMANCE_SCHEMA
+     Support: YES
+     Comment: Performance Schema
+Transactions: NO
+          XA: NO
+  Savepoints: NO
+9 rows in set (0.05 sec)
+````
+可以看出有9个存储引擎。
+- Engine: InnoDB 存储引擎的名字
+- Support: DEFAULT 是否支持该类引擎
+- Comment: Supports transactions, row-level locking, and foreign k 对该引擎的评论
+- Transactions: YES 是否支持事务处理
+- XA: YES 是否分布式交易处理的XA规范 
+- Savepoints: YES 是否支持保持点。
+
+InnoDB为默认存储引擎。
+
+查询MySQL支持的存储引擎。
+* Variable_name：存储引擎的名字
+* Value：是否支持。YES表示支持，NO表示不支持，DISABLED表示支持但没有开启
 
 ```
-mysql> SHOW ENGINES;
-+--------------------+---------+------------------------------------------------
-----------------+--------------+------+------------+
-| Engine             | Support | Comment
-                | Transactions | XA   | Savepoints |
-+--------------------+---------+------------------------------------------------
-----------------+--------------+------+------------+
-| FEDERATED          | NO      | Federated MySQL storage engine
-                | NULL         | NULL | NULL       |
-| MRG_MYISAM         | YES     | Collection of identical MyISAM tables
-                | NO           | NO   | NO         |
-| MyISAM             | YES     | MyISAM storage engine
-                | NO           | NO   | NO         |
-| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to
- it disappears) | NO           | NO   | NO         |
-| CSV                | YES     | CSV storage engine
-                | NO           | NO   | NO         |
-| MEMORY             | YES     | Hash based, stored in memory, useful for tempor
-ary tables      | NO           | NO   | NO         |
-| ARCHIVE            | YES     | Archive storage engine
-                | NO           | NO   | NO         |
-| InnoDB             | DEFAULT | Supports transactions, row-level locking, and f
-oreign keys     | YES          | YES  | YES        |
-| PERFORMANCE_SCHEMA | YES     | Performance Schema
-                | NO           | NO   | NO         |
-+--------------------+---------+------------------------------------------------
-----------------+--------------+------+------------+
-````
+mysql> SHOW VARIABLES LIKE "have%";
++----------------------+----------+
+| Variable_name        | Value    |
++----------------------+----------+
+| have_compress        | YES      |
+| have_crypt           | NO       |
+| have_dynamic_loading | YES      |
+| have_geometry        | YES      |
+| have_openssl         | DISABLED |
+| have_profiling       | YES      |
+| have_query_cache     | YES      |
+| have_rtree_keys      | YES      |
+| have_ssl             | DISABLED |
+| have_symlink         | YES      |
++----------------------+----------+
+10 rows in set (0.00 sec)
+```
+
+#### InnoDB存储引擎
+
+InnoDB给MySQL的表提供了事务、回滚、崩溃修复能力和多版本并发控制的事务安全。
+* 支持自动式增长列AUTO_INCRECENT
+* 支持外键
+* 创建的表存储在.frm文件中
+* 提供了良好的事务管理、崩溃修复和并发控制。缺点是读写效率稍差。
+
+#### MyISAM存储引擎
+
